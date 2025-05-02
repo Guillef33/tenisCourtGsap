@@ -7,6 +7,7 @@ const ladoAbajo = document.querySelector("#ladoAbajo");
 const resultadoGame = document.querySelector("#resultadoGame");
 
 const jugadorUno = {
+  nombre: "jugador Uno",
   node: document.querySelector("#playerOne"),
   turno: document.querySelector("#turnoPlayerOne"),
   velocidad: 1,
@@ -17,6 +18,7 @@ const jugadorUno = {
 };
 
 const jugadorDos = {
+  nombre: "jugador Dos",
   node: document.querySelector("#playerTwo"),
   turno: document.querySelector("#turnoPlayerTwo"),
   velocidad: 1,
@@ -105,7 +107,7 @@ function manejarTurno(jugadorActivo, jugadorPasivo, zona, x, y) {
         jugadorActivo === jugadorUno ? "jugador Uno" : "jugador Dos"
       }`
     );
-    reiniciarElPunto(jugadorPasivo, jugadorActivo)
+    reiniciarElPunto(jugadorPasivo, jugadorActivo);
     jugadorPasivo.turno.style.opacity = 0;
   }
 }
@@ -142,5 +144,6 @@ function movePlayerToTheBall(x, y, player) {
 function reiniciarElPunto(ganador, perdedor) {
   sumarPuntos(ganador);
   resultadoGame.style.opacity = 1;
-  resultadoGame.textContent = `Punto para ${ganador}. El resultado es 15 a 0`;
+  resultadoGame.textContent = `Punto para ${ganador.nombre}. El resultado es 15 a 0`;
+  jugador.mensajeTiro.style.opacity = 0;
 }
