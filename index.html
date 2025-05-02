@@ -9,40 +9,43 @@
   </head>
   <body>
     <main
-      class="min-h-screen bg-blue-100 w-[500px] flex justify-center items-center"
+      class="min-h-screen bg-gray-100 w-[350px] flex justify-center items-center"
     >
-      <!-- <article 
+      <article
         id="court"
-        class="w-[360px] h-[520px] bg-white rounded-2xl shadow-xl relative"
-        style="
-          background-image: url('./assets/court.jpg');
-          background-size: contain;
-          background-position: center;
-          background-repeat: no-repeat;
-        "
-      > -->
-      <article id="court" class="relative w-[360px] h-[520px] bg-green-700 border-4 border-white mx-auto my-10">
+        class="relative w-[360px] h-[520px] bg-green-700 border-4 border-white mx-auto my-10"
+      >
         <div id="ladoArriba" class="relative w-full h-[50%]">
-          <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-[2px] h-full bg-white opacity-80"></div>
-          <div class="absolute top-[0%] left-[10%] w-[40%] h-[100%] border border-white"></div>
-          <div class="absolute top-[0%] right-[10%] w-[40%] h-[100%] border border-white"></div>
+          <div
+            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-[2px] h-full bg-white opacity-80"
+          ></div>
+          <div
+            class="absolute top-[0%] left-[10%] w-[40%] h-[100%] border border-white"
+          ></div>
+          <div
+            class="absolute top-[0%] right-[10%] w-[40%] h-[100%] border border-white"
+          ></div>
           <div class="absolute top-0 left-0 w-full h-[2px] bg-white"></div>
         </div>
 
-        <div id="ladoAbajo"  class="relative w-full h-[50%]">
-          <div class="absolute bottom-[0%] left-[10%] w-[40%] h-[100%] border border-white"></div>
-          <div class="absolute bottom-[0%] right-[10%] w-[40%] h-[100%] border border-white"></div>
+        <div id="ladoAbajo" class="relative w-full h-[50%]">
+          <div
+            class="absolute bottom-[0%] left-[10%] w-[40%] h-[100%] border border-white"
+          ></div>
+          <div
+            class="absolute bottom-[0%] right-[10%] w-[40%] h-[100%] border border-white"
+          ></div>
           <div class="absolute bottom-0 left-0 w-full h-[2px] bg-white"></div>
         </div>
-      
 
         <!-- Línea central izquierda -->
-        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 w-full h-[2px] bg-white opacity-80"></div>
+        <div
+          class="absolute top-1/2 left-0 transform -translate-y-1/2 w-full h-[2px] bg-white opacity-80"
+        ></div>
         <!-- Línea lateral izquierda -->
         <div class="absolute top-0 left-0 h-full w-[2px] bg-white"></div>
         <!-- Línea lateral derecha -->
-        <div class="absolute top-0 right-0 h-full w-[2px] bg-white"></div>        
-        
+        <div class="absolute top-0 right-0 h-full w-[2px] bg-white"></div>
         <div
           class="h-8 w-8 bg-red-700 rounded-full absolute top-10 left-30 cursor-pointer"
           id="playerOne"
@@ -62,17 +65,17 @@
         ></div>
 
         <div
-          class="absolute top-0 left-10 text-gray-500 font-bold text-sm w-64 bg-white opacity-0 text-center"
+          class="absolute top-0 left-10 text-gray-500 font-bold text-sm w-64 bg-white text-center"
           id="turnoPlayerOne"
         >
-          Es el turno del jugador Blanco
+          Es el turno del jugador Uno
         </div>
 
         <div
           class="absolute top-0 left-10 text-gray-500 font-bold text-sm w-64 bg-white opacity-0 text-center"
           id="turnoPlayerTwo"
         >
-          Es el turno del jugador Rojo
+          Es el turno del jugador Dos
         </div>
 
         <div
