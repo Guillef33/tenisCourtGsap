@@ -4,6 +4,8 @@ const marker = document.querySelector("#clickMarker");
 const ladoArriba = document.querySelector("#ladoArriba");
 const ladoAbajo = document.querySelector("#ladoAbajo");
 
+const resultadoGame = document.querySelector("#resultadoGame");
+
 const jugadorUno = {
   node: document.querySelector("#playerOne"),
   turno: document.querySelector("#turnoPlayerOne"),
@@ -86,29 +88,25 @@ function evaluarZonaTiro(x, y) {
 function manejarTurno(jugadorActivo, jugadorPasivo, zona, x, y) {
   jugadorActivo.turno.style.opacity = 1;
   jugadorPasivo.turno.style.opacity = 0;
-  jugadorPasivo.mensajeTiro.style.opacity = 0; // Reset mensaje de tiro del jugador pasivo
+  jugadorPasivo.mensajeTiro.style.opacity = 0;
 
   if (zona === "arriba" && jugadorActivo === jugadorUno) {
-    // Buen tiro de jugadorUno
     mostrarMensajeDeTiro(jugadorUno, "¡Buen tiro jugador Uno!");
     movePlayerToTheBall(y, x, jugadorUno.node);
     jugadorPasivo.turno.style.opacity = 1;
   } else if (zona === "abajo" && jugadorActivo === jugadorDos) {
-    // Buen tiro de jugadorDos
     mostrarMensajeDeTiro(jugadorDos, "¡Buen tiro jugador Dos!");
     movePlayerToTheBall(y, x, jugadorDos.node);
     jugadorPasivo.turno.style.opacity = 1;
   } else {
-    // Fallo
     mostrarMensajeDeTiro(
       jugadorActivo,
       `Has fallado el tiro ${
         jugadorActivo === jugadorUno ? "jugador Uno" : "jugador Dos"
       }`
     );
-    // Sumar puntos al jugador pasivo si falló el tiro
-    sumarPuntos(jugadorPasivo);
-    jugadorPasivo.turno.style.opacity = 1;
+    reiniciarElPunto(jugadorPasivo, jugadorActivo)
+    jugadorPasivo.turno.style.opacity = 0;
   }
 }
 
@@ -119,7 +117,7 @@ function turnos(x, y, zona) {
     manejarTurno(jugadorDos, jugadorUno, zona, x, y);
   }
 
-  turno++; 
+  turno++;
 }
 
 function mostrarMensajeDeTiro(jugador, mensaje) {
@@ -141,6 +139,8 @@ function movePlayerToTheBall(x, y, player) {
   });
 }
 
-function reiniciarElPunto () {
-  
+function reiniciarElPunto(ganador, perdedor) {
+  sumarPuntos(ganador);
+  resultadoGame.style.opacity = 1;
+  resultadoGame.textContent = `Punto para ${ganador}. El resultado es 15 a 0`;
 }
