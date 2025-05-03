@@ -6,15 +6,12 @@ const ladoAbajo = document.querySelector("#ladoAbajo");
 
 const resultadoGame = document.querySelector("#resultadoGame");
 
-
-
-
 const jugadorUno = {
   nombre: "jugador Uno",
   node: document.querySelector("#playerOne"),
   turno: document.querySelector("#turnoPlayerOne"),
   velocidad: 1,
-  potenciaTiro: 3,
+  potenciaTiro: 1,
   puntaje: document.querySelector("#resultadoJugadorUno"),
   puntos: 0,
   mensajeTiro: document.querySelector("#tiroPlayerOne"),
@@ -39,7 +36,6 @@ function manejarClickEnLaCancha(e) {
   let coordenadasTiro = calcularCoordenadasDelClick(e);
   dibujarMarker(coordenadasTiro.x, coordenadasTiro.y);
   const zona = evaluarZonaTiro(coordenadasTiro.x, coordenadasTiro.y);
-
   turnos(coordenadasTiro.x, coordenadasTiro.y, zona);
 }
 
@@ -88,13 +84,16 @@ function manejarTurno(jugadorActivo, jugadorPasivo, zona, x, y) {
   jugadorPasivo.turno.style.opacity = 0;
   jugadorPasivo.mensajeTiro.style.opacity = 0;
 
-  animarPelota(x, y, jugadorActivo.potenciaTiro);
 
   if (zona === "arriba" && jugadorActivo === jugadorUno) {
+    animarPelota(x, y, jugadorActivo.potenciaTiro, 'arriba');
+
     mostrarMensajeDeTiro(jugadorUno, "¡Buen tiro jugador Uno!");
     moverJugadorHaciaLaPelota(y, x, jugadorUno.node, jugadorUno.velocidad);
     jugadorPasivo.turno.style.opacity = 1;
   } else if (zona === "abajo" && jugadorActivo === jugadorDos) {
+    animarPelota(x, y, jugadorActivo.potenciaTiro, 'abajo');
+
     mostrarMensajeDeTiro(jugadorDos, "¡Buen tiro jugador Dos!");
     moverJugadorHaciaLaPelota(y, x, jugadorDos.node, jugadorDos.velocidad);
     jugadorPasivo.turno.style.opacity = 1;
@@ -142,28 +141,40 @@ function moverJugadorHaciaLaPelota(x, y, marker, velocidad) {
 
 
 
-function animarPelota(x, y, potenciaTiro) {
-
-  gsap.registerPlugin(CustomEase);
-
-  CustomEase.create("myBounce", "M0,0 C0.25,1.5 0.5,1 1,1");
+function animarPelota(x, y, potenciaTiro, zona) {
 
   const tl = gsap.timeline();
+  if (zona === "arriba") {
+    tl.to(ball, {
+      top: y + "px",
+      left: x + "px",
+      duration: potenciaTiro,
+      ease: "linear",
+    })
+  
+    .to(ball, {
+      top: "20px",
+      left: "200x",
+      duration: potenciaTiro * 0.3,
+      ease: "power2.in",
+    })
+  } else {
+    tl.to(ball, {
+      top: y + "px",
+      left: x + "px",
+      duration: potenciaTiro,
+      ease: "linear",
+    })
+  
+    .to(ball, {
+      top: '100%',
+      bottom: "30px",
+      left: "20x",
+      duration: potenciaTiro * 0.3,
+      ease: "power2.in",
+    })
+  }
 
-  // Primer rebote (alto y largo)
-  tl.to(ball, {
-    top: y + "px",
-    left: x + "px",
-    duration: potenciaTiro,
-    ease: "linear",
-  })
-
-  // Rebote hacia arriba (más corto)
-  .to(ball, {
-    top: "20px",
-    duration: potenciaTiro * 0.3,
-    ease: "power2.in",
-  })
 }
 
 function reiniciarElPunto(ganador, perdedor) {
