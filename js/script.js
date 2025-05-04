@@ -15,6 +15,18 @@ const jugadorUno = {
   puntaje: document.querySelector("#resultadoJugadorUno"),
   puntos: 0,
   mensajeTiro: document.querySelector("#tiroPlayerOne"),
+  initialX: 0,
+  initialY: 0,
+  prevX: 0,  
+  prevY: 0,  
+
+  actualizarPosicion: function () {
+    const rect = this.node.getBoundingClientRect();
+    this.prevX = this.initialX;
+    this.prevY = this.initialY;
+    this.initialX = rect.left;
+    this.initialY = rect.top;
+  }
 };
 
 const jugadorDos = {
@@ -26,14 +38,42 @@ const jugadorDos = {
   puntaje: document.querySelector("#resultadoJugadorDos"),
   puntos: 0,
   mensajeTiro: document.querySelector("#tiroPlayerTwo"),
+  initialX:  0,
+  initialY: 0,
+  prevX: 0,  
+  prevY: 0, 
+
+  actualizarPosicion: function () {
+    const rect = this.node.getBoundingClientRect();
+    this.prevX = this.initialX;
+    this.prevY = this.initialY;
+    this.initialX = rect.left;
+    this.initialY = rect.top;
+  }
 };
 
 let turno = 0;
 
+// Inicializar posiciones de ambos jugadores
+function inicializarPosiciones() {
+  jugadorUno.actualizarPosicion();
+  jugadorDos.actualizarPosicion();
+  console.log("Posiciones inicializadas:", 
+              "J1:", jugadorUno.initialX, jugadorUno.initialY, 
+              "J2:", jugadorDos.initialX, jugadorDos.initialY);
+}
+
+// Llamar a inicializarPosiciones cuando carga la página
+document.addEventListener('DOMContentLoaded', inicializarPosiciones);
+
 court.addEventListener("click", manejarClickEnLaCancha);
 
+
 function manejarClickEnLaCancha(e) {
-  let coordenadasTiro = calcularCoordenadasDelClick(e);
+  let coordenadasTiro = calcularCoordenadasDelClick(e)
+  
+
+
   dibujarMarker(coordenadasTiro.x, coordenadasTiro.y);
   const zona = evaluarZonaTiro(coordenadasTiro.x, coordenadasTiro.y);
   turnos(coordenadasTiro.x, coordenadasTiro.y, zona);
@@ -79,35 +119,27 @@ function evaluarZonaTiro(x, y) {
   return "fuera";
 }
 
-function manejarTurno(jugadorActivo, jugadorPasivo, zona, x, y) {
-  jugadorActivo.turno.style.opacity = 1;
-  jugadorPasivo.turno.style.opacity = 0;
-  jugadorPasivo.mensajeTiro.style.opacity = 0;
-
-
-  if (zona === "arriba" && jugadorActivo === jugadorUno) {
-    animarPelota(x, y, jugadorActivo.potenciaTiro, 'arriba');
-
-    mostrarMensajeDeTiro(jugadorUno, "¡Buen tiro jugador Uno!");
-    moverJugadorHaciaLaPelota(y, x, jugadorUno.node, jugadorUno.velocidad);
-    jugadorPasivo.turno.style.opacity = 1;
-  } else if (zona === "abajo" && jugadorActivo === jugadorDos) {
-    animarPelota(x, y, jugadorActivo.potenciaTiro, 'abajo');
-
-    mostrarMensajeDeTiro(jugadorDos, "¡Buen tiro jugador Dos!");
-    moverJugadorHaciaLaPelota(y, x, jugadorDos.node, jugadorDos.velocidad);
-    jugadorPasivo.turno.style.opacity = 1;
-  } else {
-    mostrarMensajeDeTiro(
-      jugadorActivo,
-      `Has fallado el tiro ${
-        jugadorActivo === jugadorUno ? "jugador Uno" : "jugador Dos"
-      }`
-    );
-    reiniciarElPunto(jugadorPasivo, jugadorActivo);
+  function manejarTurno(jugadorActivo, jugadorPasivo, zona, x, y) {
+    jugadorActivo.turno.style.opacity = 1;
     jugadorPasivo.turno.style.opacity = 0;
+    jugadorPasivo.mensajeTiro.style.opacity = 0;
+  
+    if ((zona === "arriba" && jugadorActivo === jugadorUno) || 
+        (zona === "abajo" && jugadorActivo === jugadorDos)) {
+      
+      animarPelota(x, y, jugadorActivo.potenciaTiro, zona, jugadorActivo);
+      mostrarMensajeDeTiro(jugadorActivo, `¡Buen tiro ${jugadorActivo.nombre}!`);
+      moverJugadorHaciaLaPelota(y, x, jugadorActivo.node, jugadorActivo.velocidad);
+      jugadorPasivo.turno.style.opacity = 1;
+    } else {
+      mostrarMensajeDeTiro(
+        jugadorActivo,
+        `Has fallado el tiro ${jugadorActivo.nombre}`
+      );
+      reiniciarElPunto(jugadorPasivo, jugadorActivo);
+      jugadorPasivo.turno.style.opacity = 0;
+    }
   }
-}
 
 function turnos(x, y, zona) {
   if (turno % 2 === 0) {
@@ -130,7 +162,6 @@ function sumarPuntos(jugador) {
 }
 
 function moverJugadorHaciaLaPelota(x, y, marker, velocidad) {
-  console.log(velocidad)
   gsap.to(marker, {
     top: x,
     left: y,
@@ -141,67 +172,88 @@ function moverJugadorHaciaLaPelota(x, y, marker, velocidad) {
 
 
 
-function animarPelota(x, y, potenciaTiro, zona) {
-
-  const tl = gsap.timeline();
-  if (zona === "arriba") {
+  // Función mejorada para animar el pique de la pelota
+  function animarPelota(targetX, targetY, potenciaTiro, zona, jugadorActivo) {
+    const ballRect = ball.getBoundingClientRect();
+    const ballX = ballRect.left;
+    const ballY = ballRect.top;
+    
+    jugadorActivo.actualizarPosicion();
+    
+    // Calculamos la dirección del tiro
+    const dx = targetX - jugadorActivo.initialX;
+    const dy = targetY - jugadorActivo.initialY;
+    
+    // Normalizamos el vector de dirección
+    const magnitude = Math.sqrt(dx * dx + dy * dy);
+    const dirX = dx / magnitude;
+    const dirY = dy / magnitude;
+    
+    let bounceX, bounceY;
+    
+    if (zona === "arriba") {
+      // Si el tiro es hacia arriba, el rebote sube
+      bounceX = targetX + dirX * 150;
+      bounceY = targetY - Math.abs(dirY) * 150; 
+    } else if (zona === "abajo") {
+      // Si el tiro es hacia abajo, el rebote baja
+      bounceX = targetX + dirX * 150;
+      bounceY = targetY + Math.abs(dirY) * 150; 
+    }
+    
+    console.log("Tiro:", targetX, targetY);
+    console.log("Jugador:", jugadorActivo.nombre, jugadorActivo.initialX, jugadorActivo.initialY);
+    console.log("Dirección:", dirX, dirY);
+    console.log("Rebote:", bounceX, bounceY);
+    
+   
+    const tl = gsap.timeline();
+    
     tl.to(ball, {
-      top: y + "px",
-      left: x + "px",
-      duration: potenciaTiro,
-      ease: "linear",
+      top: targetY + "px",
+      left: targetX + "px",
+      duration: potenciaTiro * 0.5,
+      ease: "power1.out"
     })
-  
-    .to(ball, {
-      top: "20px",
-      left: "200x",
-      duration: potenciaTiro * 0.3,
-      ease: "power2.in",
-    })
-  } else {
-    tl.to(ball, {
-      top: y + "px",
-      left: x + "px",
-      duration: potenciaTiro,
-      ease: "linear",
-    })
-  
-    .to(ball, {
-      top: '100%',
-      bottom: "30px",
-      left: "20x",
-      duration: potenciaTiro * 0.3,
-      ease: "power2.in",
-    })
+    // .to(ball, {
+    //   top: bounceX + "px",
+    //   left: bounceY + "px",
+    //   duration: potenciaTiro * 0.3,
+    //   ease: "power2.out"
+    // });
+       
+    return tl;
   }
 
-}
 
-function reiniciarElPunto(ganador, perdedor) {
-  sumarPuntos(ganador);
-  resultadoGame.style.opacity = 1;
-  resultadoGame.textContent = `Punto para ${ganador.nombre}. El resultado es 15 a 0`;
-  perdedor.mensajeTiro.style.opacity = 0;
-  perdedor.turno.style.opacity = 0;
-  ganador.turno.style.opacity = 0;
-
-  jugadorUno.node.style.top = '20px';
-  jugadorUno.node.style.left = '250px';
-  jugadorDos.node.style.bottom = '30px';
-  jugadorDos.node.style.left = '70px';
-
-  setTimeout(() => {
-    turno = 0;
-    resultadoGame.style.opacity = 0;
-    gsap.to(ball, {
-      bottom: 20,
-      left: 50,
-      top: 0,
-      duration: 1,
-      ease: "linear",
-    });
-
-  }, 1000);
+  function reiniciarElPunto(ganador, perdedor) {
+    sumarPuntos(ganador);
+    resultadoGame.style.opacity = 1;
+    resultadoGame.textContent = `Punto para ${ganador.nombre}. El resultado es 15 a 0`;
+    perdedor.mensajeTiro.style.opacity = 0;
+    perdedor.turno.style.opacity = 0;
+    ganador.turno.style.opacity = 0;
   
+    console.log(jugadorUno.prevY);
+    console.log(jugadorUno.prevX);
   
-}
+    setTimeout(() => {
+      jugadorUno.node.style.top = `${jugadorUno.prevY + 20}px`;
+      jugadorUno.node.style.left = `${jugadorUno.prevX}px`; 
+      jugadorDos.node.style.top = `${jugadorDos.prevY}px`; 
+      jugadorDos.node.style.left = `${jugadorDos.prevX}px`; 
+    
+      turno = 0;
+      resultadoGame.style.opacity = 0;
+  
+      // gsap.to(ball, {
+      //   // bottom: 20,
+      //   left: jugadorUno.initialX,
+      //   top: jugadorUno.initialY,
+      //   duration: 1,
+      //   ease: "linear",
+      // });
+  
+    }, 1000);
+  }
+  
