@@ -71,9 +71,6 @@ court.addEventListener("click", manejarClickEnLaCancha);
 
 function manejarClickEnLaCancha(e) {
   let coordenadasTiro = calcularCoordenadasDelClick(e)
-  
-
-
   dibujarMarker(coordenadasTiro.x, coordenadasTiro.y);
   const zona = evaluarZonaTiro(coordenadasTiro.x, coordenadasTiro.y);
   turnos(coordenadasTiro.x, coordenadasTiro.y, zona);
@@ -129,7 +126,7 @@ function evaluarZonaTiro(x, y) {
       
       animarPelota(x, y, jugadorActivo.potenciaTiro, zona, jugadorActivo);
       mostrarMensajeDeTiro(jugadorActivo, `¡Buen tiro ${jugadorActivo.nombre}!`);
-      moverJugadorHaciaLaPelota(y, x, jugadorActivo.node, jugadorActivo.velocidad);
+      moverJugadorHaciaLaPelota(y, x, jugadorActivo.node, jugadorActivo.velocidad, zona);
       jugadorPasivo.turno.style.opacity = 1;
     } else {
       mostrarMensajeDeTiro(
@@ -161,13 +158,21 @@ function sumarPuntos(jugador) {
   jugador.puntaje.textContent = jugador.puntos;
 }
 
-function moverJugadorHaciaLaPelota(x, y, marker, velocidad) {
-  gsap.to(marker, {
-    top: x,
-    left: y,
-    duration: velocidad,
-    ease: "linear",
-  });
+function moverJugadorHaciaLaPelota(x, y, marker, velocidad, zona) {
+  let zonaDestino = evaluarZonaTiro(y, x);
+
+  if (zonaDestino !== zona) {
+    console.log(`Movimiento bloqueado: ${zonaDestino} no es ${zona}`);
+    return;
+  }
+    gsap.to(marker, {
+      top: x,
+      left: y,
+      duration: velocidad,
+      ease: "linear",
+    });
+
+
 }
 
 
